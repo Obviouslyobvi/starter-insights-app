@@ -1,0 +1,132 @@
+
+import React from 'react';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  PieChart, Pie, Cell, Legend 
+} from 'recharts';
+import { StoryAnalysis } from '../types';
+
+interface TrendsProps {
+  analyses: StoryAnalysis[];
+}
+
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+
+const Trends: React.FC<TrendsProps> = ({ analyses }) => {
+  if (analyses.length === 0) {
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-bold text-slate-400">Not enough data to generate trends</h2>
+        <p className="text-slate-500 mt-2">Analyze at least 3 stories to see aggregate market intelligence.</p>
+      </div>
+    );
+  }
+
+  // Calculate top distribution channels
+  const distCounts: Record<string, number> = {};
+  analyses.forEach(a => {
+    a.mainDistributionChannels.forEach(c => {
+      const normalized = c.trim().toLowerCase();
+      distCounts[normalized] = (distCounts[normalized] || 0) + 1;
+    });
+  });
+
+  const distData = Object.entries(distCounts)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 10)
+    .map(([name, value]) => ({ name, value }));
+
+  // Calculate monetization frequency
+  const monCounts: Record<string, number> = {};
+  analyses.forEach(a => {
+    a.mainMonetizationMethods.forEach(m => {
+      const normalized = m.trim().toLowerCase();
+      monCounts[normalized] = (monCounts[normalized] || 0) + 1;
+    });
+  });
+
+  const monData = Object.entries(monCounts)
+    .sort(([, a], [, b]) => b - a)
+    .map(([name, value]) => ({ name, value }));
+
+  // Category distribution
+  const catCounts: Record<string, number> = {};
+  analyses.forEach(a => {
+    catCounts[a.category] = (catCounts[a.category] || 0) + 1;
+  });
+  const catData = Object.entries(catCounts).map(([name, value]) => ({ name, value }));
+
+  return (
+    <div className="space-y-8 animate-fadeIn">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">Market Intelligence</h1>
+        <p className="text-slate-500 mt-1">Aggregated insights across your analyzed database.</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Distribution Chart */}
+        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-800 mb-6">Top Growth Channels</h3>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={distData} layout="vertical" margin={{ left: 40, right: 30 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                <XAxis type="number" hide />
+                <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 12 }} />
+                <Tooltip 
+                  cursor={{ fill: '#f1f5f9' }}
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                />
+                <Bar dataKey="value" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Category Pie Chart */}
+        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-800 mb-6">Business Categories</h3>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={catData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {catData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={36}/>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Monetization Ranking */}
+        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2">
+          <h3 className="text-lg font-bold text-slate-800 mb-6">Monetization Dominance</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {monData.map((item, idx) => (
+              <div key={item.name} className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="text-2xl font-black text-slate-200">#0{idx + 1}</div>
+                <div>
+                  <p className="text-sm font-bold text-slate-700 capitalize">{item.name}</p>
+                  <p className="text-xs text-slate-400">{item.value} companies</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Trends;

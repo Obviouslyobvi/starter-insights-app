@@ -1,0 +1,22 @@
+
+{
+  "name": "starter-insights",
+  "version": "1.0.0",
+  "description": "AI-powered analysis tool for Starter Story case studies.",
+  "main": "index.html",
+  "dependencies": {
+    "@google/genai": "^1.38.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.0",
+    "recharts": "^3.7.0"
+  },
+  "keywords": [
+    "ai",
+    "gemini",
+    "business-analysis",
+    "google-sheets"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
