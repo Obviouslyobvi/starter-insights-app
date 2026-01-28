@@ -1,14 +1,13 @@
-
 {
   "name": "starter-insights",
   "version": "1.0.0",
   "description": "AI-powered analysis tool for Starter Story case studies.",
   "main": "index.html",
-    "scripts": {
-          "dev": "vite",
-          "build": "vite build",
-          "preview": "vite preview"
-    },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "@google/genai": "^1.38.0",
     "react": "^19.2.4",
@@ -24,11 +23,11 @@
   ],
   "author": "Your Name",
   "license": "MIT",
-    "devDependencies": {
-          "@types/react": "^18.2.66",
-          "@types/react-dom": "^18.2.22",
-          "@vitejs/plugin-react": "^4.2.1",
-          "typescript": "^5.2.2",
-          "vite": "^5.2.0"
-    }
+  "devDependencies": {
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0"
+  }
 }
