@@ -6,7 +6,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const discoverAllStories = async (existingCount: number = 0, batchSize: number = 10): Promise<string[]> => {
   const response = await ai.models.generateContent({
-    model: 'gemini-3-pro-preview',
+    model: 'gemini-2.0-flash',
     contents: `You are a high-performance business intelligence bot. 
     Find ${batchSize} unique, high-revenue case study company names from starterstory.com. 
     
@@ -40,7 +40,7 @@ export const discoverAllStories = async (existingCount: number = 0, batchSize: n
 
 export const analyzeStory = async (companyName: string): Promise<AnalysisResult> => {
   const response = await ai.models.generateContent({
-    model: 'gemini-3-pro-preview',
+    model: 'gemini-2.0-flash',
     contents: `Deeply analyze the business case study for "${companyName}" on starterstory.com.
     
     You must extract high-signal data:
