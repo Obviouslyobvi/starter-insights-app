@@ -64,8 +64,21 @@ const App: React.FC = () => {
         .then((id) => {
           setSpreadsheetId(id);
           localStorage.setItem('gsheet_id', id);
-          return sheetService.getAllStories(id);
         })
+        .catch((err) => {
+          console.error('Sheet init error:', err);
+          alert('Failed to initialize Google Sheet: ' + err.message);
+        })
+        .finally(() => setIsInitializing(false));
+    }
+  }, [googleToken, spreadsheetId]);
+
+  // Load all stories from Google Sheet
+  useEffect(() => {
+    if (googleToken && spreadsheetId && analyses.length === 0) {
+      setIsInitializing(true);
+      const sheetService = new GoogleSheetsService(googleToken);
+      sheetService.getAllStories(spreadsheetId)
         .then((stories) => {
           const fullStories = stories.map((s, i) => ({
             ...s,
@@ -75,8 +88,7 @@ const App: React.FC = () => {
           setAnalyses(fullStories);
         })
         .catch((err) => {
-          console.error('Sheet init error:', err);
-          alert('Failed to initialize Google Sheet: ' + err.message);
+          console.error('Load stories error:', err);
         })
         .finally(() => setIsInitializing(false));
     }
