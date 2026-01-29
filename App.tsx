@@ -55,6 +55,33 @@ const App: React.FC = () => {
     localStorage.setItem('manual_override_uri', manualRedirectUri.trim());
   }, [clientId, manualRedirectUri]);
 
+  // Initialize Google Sheet after login
+  useEffect(() => {
+    if (googleToken && !spreadsheetId) {
+      setIsInitializing(true);
+      const sheetService = new GoogleSheetsService(googleToken);
+      sheetService.findOrCreateSheet()
+        .then((id) => {
+          setSpreadsheetId(id);
+          localStorage.setItem('gsheet_id', id);
+          return sheetService.getAllStories(id);
+        })
+        .then((stories) => {
+          const fullStories = stories.map((s, i) => ({
+            ...s,
+            id: `sheet-${i}`,
+            rawContent: 'Loaded from Google Sheets',
+          })) as StoryAnalysis[];
+          setAnalyses(fullStories);
+        })
+        .catch((err) => {
+          console.error('Sheet init error:', err);
+          alert('Failed to initialize Google Sheet: ' + err.message);
+        })
+        .finally(() => setIsInitializing(false));
+    }
+  }, [googleToken, spreadsheetId]);
+
   const handleLogin = () => {
     if (!clientId.trim().includes('.apps.googleusercontent.com')) {
       alert("⚠️ PAUSE: You need to paste your Google Client ID into Step 2 first.");
