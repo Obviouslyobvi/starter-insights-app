@@ -16,7 +16,6 @@ export const discoverAllStories = async (existingCount: number = 0, batchSize: n
     - Avoid these existing ${existingCount} items (just focus on finding new, diverse ones).
     - Return ONLY a JSON array of company names.`,
     config: {
-      tools: [{ googleSearch: {} }],
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.ARRAY,
@@ -52,10 +51,8 @@ export const analyzeStory = async (companyName: string): Promise<AnalysisResult>
     6. Summary: A punchy 2-sentence summary of the business.
     7. Category: Choose the most accurate one (e.g., Vertical SaaS, D2C, Micro-SaaS, B2B Service).
     
-    Use Google Search to verify the latest data from the Starter Story article.
     Return as a JSON object.`,
     config: {
-      tools: [{ googleSearch: {} }],
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
