@@ -12,6 +12,8 @@ export interface StoryAnalysis {
   analyzedAt: string;
   category: string;
   sourceUrl?: string;
+  starterStoryUrl?: string;
+  companyWebsite?: string;
 }
 
 export interface AnalysisResult {
@@ -23,6 +25,8 @@ export interface AnalysisResult {
   ahaMoment: string;
   summary: string;
   category: string;
+  starterStoryUrl: string;
+  companyWebsite: string;
 }
 
 export enum AppRoute {
