@@ -87,7 +87,9 @@ const AnalyzeForm: React.FC<AnalyzeFormProps> = ({ onAdd, existingAnalyses, goog
             summary: result.summary,
             category: result.category,
             rawContent: "Extracted via Gemini Pro",
-            analyzedAt: new Date().toISOString()
+            analyzedAt: new Date().toISOString(),
+            starterStoryUrl: result.starterStoryUrl,
+            companyWebsite: result.companyWebsite
           };
 
           addLog(`Cloud Sync: Writing ${target} to Google Sheets...`, 'info');

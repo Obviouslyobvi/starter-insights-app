@@ -60,6 +60,8 @@ export class GoogleSheetsService {
                       { userEnteredValue: { stringValue: "Summary" } },
                       { userEnteredValue: { stringValue: "Category" } },
                       { userEnteredValue: { stringValue: "Analyzed At" } },
+                      { userEnteredValue: { stringValue: "Starter Story URL" } },
+                      { userEnteredValue: { stringValue: "Company Website" } },
                     ],
                   },
                 ],
@@ -73,8 +75,7 @@ export class GoogleSheetsService {
   }
 
   async appendStory(spreadsheetId: string, story: StoryAnalysis) {
-    // Fix: Updated append range to A:I to include Aha! Moment
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Case Studies!A:I:append?valueInputOption=USER_ENTERED`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Case Studies!A:K:append?valueInputOption=USER_ENTERED`;
     await this.fetchGoogle(url, {
       method: "POST",
       body: JSON.stringify({
@@ -89,6 +90,8 @@ export class GoogleSheetsService {
             story.summary,
             story.category,
             story.analyzedAt,
+            story.starterStoryUrl || "",
+            story.companyWebsite || "",
           ],
         ],
       }),
@@ -96,8 +99,7 @@ export class GoogleSheetsService {
   }
 
   async getAllStories(spreadsheetId: string): Promise<Partial<StoryAnalysis>[]> {
-    // Fix: Updated fetch range to A2:I and mapped ahaMoment correctly
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Case Studies!A2:I`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Case Studies!A2:K`;
     const data = await this.fetchGoogle(url);
     if (!data.values) return [];
 
@@ -111,6 +113,8 @@ export class GoogleSheetsService {
       summary: row[6] || "",
       category: row[7] || "",
       analyzedAt: row[8] || "",
+      starterStoryUrl: row[9] || "",
+      companyWebsite: row[10] || "",
     }));
   }
 }
