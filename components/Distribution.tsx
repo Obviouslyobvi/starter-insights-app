@@ -6,7 +6,7 @@ import {
   PieChart, Pie, Cell
 } from 'recharts';
 import { StoryAnalysis } from '../types';
-import { normalizeTerm } from '../utils/normalize';
+import { normalizeTerm, normalizeCategory } from '../utils/normalize';
 
 interface DistributionProps {
   analyses: StoryAnalysis[];
@@ -45,17 +45,28 @@ const Distribution: React.FC<DistributionProps> = ({ analyses }) => {
 
   const topDistData = distData.slice(0, 8);
 
-  // Calculate category-distribution matrix
+  // Calculate category-distribution matrix (with normalized categories)
   const categoryDistribution: Record<string, Record<string, number>> = {};
   analyses.forEach(a => {
-    if (!categoryDistribution[a.category]) {
-      categoryDistribution[a.category] = {};
+    const normalizedCat = normalizeCategory(a.category);
+    if (!categoryDistribution[normalizedCat]) {
+      categoryDistribution[normalizedCat] = {};
     }
     a.mainDistributionChannels.forEach(c => {
       const normalized = normalizeTerm(c);
-      categoryDistribution[a.category][normalized] = (categoryDistribution[a.category][normalized] || 0) + 1;
+      categoryDistribution[normalizedCat][normalized] = (categoryDistribution[normalizedCat][normalized] || 0) + 1;
     });
   });
+
+  // Sort categories by total count and limit to top 6
+  const sortedCategories = Object.entries(categoryDistribution)
+    .map(([cat, channels]) => ({
+      category: cat,
+      channels,
+      total: Object.values(channels).reduce((sum, c) => sum + c, 0)
+    }))
+    .sort((a, b) => b.total - a.total)
+    .slice(0, 6);
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -87,27 +98,34 @@ const Distribution: React.FC<DistributionProps> = ({ analyses }) => {
         {/* Distribution Pie Chart */}
         <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
           <h3 className="text-lg font-bold text-slate-800 mb-6">Channel Distribution</h3>
-          <div className="h-80">
+          <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={topDistData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
+                  innerRadius={50}
+                  outerRadius={80}
                   paddingAngle={2}
                   dataKey="value"
-                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                  labelLine={false}
                 >
                   {topDistData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip formatter={(value, name) => [`${value} companies`, name]} />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          {/* Legend below chart */}
+          <div className="flex flex-wrap justify-center gap-3 mt-4">
+            {topDistData.map((entry, index) => (
+              <div key={entry.name} className="flex items-center gap-2 text-xs">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                <span className="text-slate-700 font-medium">{entry.name}</span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -136,7 +154,7 @@ const Distribution: React.FC<DistributionProps> = ({ analyses }) => {
         <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2">
           <h3 className="text-lg font-bold text-slate-800 mb-6">Top Channels by Category</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Object.entries(categoryDistribution).map(([category, channels]) => {
+            {sortedCategories.map(({ category, channels }) => {
               const sortedChannels = Object.entries(channels)
                 .sort(([, a], [, b]) => b - a)
                 .slice(0, 3);
