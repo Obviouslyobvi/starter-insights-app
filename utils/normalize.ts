@@ -77,6 +77,71 @@ const TERM_MAPPINGS: Record<string, string> = {
   'virality': 'Viral Growth',
 };
 
+// Category normalization - group similar business categories
+const CATEGORY_MAPPINGS: Record<string, string> = {
+  // SaaS variations
+  'saas': 'SaaS',
+  'b2b saas': 'SaaS',
+  'b2c saas': 'SaaS',
+  'micro-saas': 'SaaS',
+  'saas platform': 'SaaS',
+  'saas (subscription)': 'SaaS',
+  'analytics saas': 'SaaS',
+  'ai tool/saas': 'SaaS',
+  'ai content generation saas': 'AI/SaaS',
+  'ai writing assistant / saas': 'AI/SaaS',
+  'vertical saas': 'SaaS',
+  'hr software': 'SaaS',
+  'dev tools': 'SaaS',
+  'devops platform': 'SaaS',
+  'low-code platform': 'SaaS',
+  'low-code/no-code': 'SaaS',
+  'integration platform': 'SaaS',
+  'wordpress plugin / saas': 'SaaS',
+
+  // E-commerce variations
+  'e-commerce': 'E-commerce',
+  'ecommerce': 'E-commerce',
+  'e-commerce platform': 'E-commerce',
+  'e-commerce marketplace': 'E-commerce',
+  'd2c': 'D2C',
+  'd2c sustainable apparel': 'D2C',
+  'd2c sales': 'D2C',
+  'direct-to-consumer (d2c) sales': 'D2C',
+  'retail': 'E-commerce',
+  'online education': 'Education',
+  'edtech': 'Education',
+  'education': 'Education',
+
+  // Service businesses
+  'b2b service': 'B2B Service',
+  'b2c service': 'B2C Service',
+  'b2b data provider': 'B2B Service',
+  'consulting': 'Services',
+  'agency': 'Services',
+
+  // Marketplace
+  'marketplace': 'Marketplace',
+  'community platform': 'Marketplace',
+
+  // Fintech
+  'fintech': 'Fintech',
+  'insurtech': 'Fintech',
+
+  // Health
+  'health & wellness': 'Health & Wellness',
+  'vr fitness / subscription': 'Health & Wellness',
+
+  // Media
+  'media': 'Media',
+  'newsletter': 'Media',
+
+  // Other
+  'affiliate marketing': 'Affiliate',
+  'affiliate marketing/community': 'Affiliate',
+  'open source software': 'Open Source',
+};
+
 /**
  * Normalize a term to its canonical form
  * Used for aggregating similar terms in charts and counts
@@ -84,6 +149,14 @@ const TERM_MAPPINGS: Record<string, string> = {
 export function normalizeTerm(term: string): string {
   const lower = term.trim().toLowerCase();
   return TERM_MAPPINGS[lower] || capitalizeWords(term.trim());
+}
+
+/**
+ * Normalize a category to its canonical form
+ */
+export function normalizeCategory(category: string): string {
+  const lower = category.trim().toLowerCase();
+  return CATEGORY_MAPPINGS[lower] || capitalizeWords(category.trim());
 }
 
 /**
@@ -105,4 +178,13 @@ export function termsMatch(term1: string, term2: string): boolean {
   return norm1.toLowerCase() === norm2.toLowerCase() ||
          norm1.toLowerCase().includes(norm2.toLowerCase()) ||
          norm2.toLowerCase().includes(norm1.toLowerCase());
+}
+
+/**
+ * Check if two categories match
+ */
+export function categoriesMatch(cat1: string, cat2: string): boolean {
+  const norm1 = normalizeCategory(cat1);
+  const norm2 = normalizeCategory(cat2);
+  return norm1.toLowerCase() === norm2.toLowerCase();
 }

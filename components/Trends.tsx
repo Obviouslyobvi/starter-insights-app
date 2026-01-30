@@ -3,10 +3,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend
+  PieChart, Pie, Cell
 } from 'recharts';
 import { StoryAnalysis } from '../types';
-import { normalizeTerm } from '../utils/normalize';
+import { normalizeTerm, normalizeCategory } from '../utils/normalize';
 
 interface TrendsProps {
   analyses: StoryAnalysis[];
@@ -60,12 +60,18 @@ const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
     .sort(([, a], [, b]) => b - a)
     .map(([name, value]) => ({ name, value }));
 
-  // Category distribution
+  // Category distribution (normalized)
   const catCounts: Record<string, number> = {};
   analyses.forEach(a => {
-    catCounts[a.category] = (catCounts[a.category] || 0) + 1;
+    const normalized = normalizeCategory(a.category);
+    catCounts[normalized] = (catCounts[normalized] || 0) + 1;
   });
-  const catData = Object.entries(catCounts).map(([name, value]) => ({ name, value }));
+  const catData = Object.entries(catCounts)
+    .sort(([, a], [, b]) => b - a)
+    .map(([name, value]) => ({ name, value }));
+
+  // Limit pie chart to top 6 categories
+  const topCatData = catData.slice(0, 6);
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -96,25 +102,26 @@ const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
 
         {/* Category Pie Chart */}
         <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-800 mb-6">Business Categories</h3>
+          <h3 className="text-lg font-bold text-slate-800 mb-6">Top Business Categories</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={catData}
+                  data={topCatData}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
+                  outerRadius={100}
+                  paddingAngle={3}
                   dataKey="value"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  labelLine={false}
                 >
-                  {catData.map((entry, index) => (
+                  {topCatData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
-                <Legend verticalAlign="bottom" height={36}/>
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -122,9 +129,9 @@ const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
 
         {/* Category Ranking - Clickable */}
         <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-800 mb-6">Categories (Click to Filter)</h3>
+          <h3 className="text-lg font-bold text-slate-800 mb-6">Top Categories (Click to Filter)</h3>
           <div className="space-y-3">
-            {catData.map((item, idx) => (
+            {catData.slice(0, 10).map((item, idx) => (
               <button
                 key={item.name}
                 onClick={() => handleCategoryClick(item.name)}
@@ -143,9 +150,9 @@ const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
 
         {/* Monetization Ranking */}
         <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-800 mb-6">Monetization Dominance</h3>
+          <h3 className="text-lg font-bold text-slate-800 mb-6">Monetization Models</h3>
           <div className="space-y-3">
-            {monData.map((item, idx) => (
+            {monData.slice(0, 8).map((item, idx) => (
               <div key={item.name} className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
                 <div className="text-2xl font-black text-slate-400">#{idx + 1}</div>
                 <div className="flex-1">
