@@ -130,7 +130,7 @@ const AnalyzeForm: React.FC<AnalyzeFormProps> = ({ onAdd, existingAnalyses, goog
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Cloud Crawler</h1>
-          <p className="text-slate-500 mt-2 font-medium">Analyze Starter Story batches directly to Sheets.</p>
+          <p className="text-slate-700 mt-2 font-medium">Analyze Starter Story batches directly to Sheets.</p>
         </div>
         
         <div className="flex items-center gap-4">
@@ -180,7 +180,7 @@ const AnalyzeForm: React.FC<AnalyzeFormProps> = ({ onAdd, existingAnalyses, goog
         <div className="p-10">
           <div className="flex items-center gap-3 mb-8 px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl">
             <div className={`w-3 h-3 rounded-full ${spreadsheetId ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`}></div>
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+            <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">
               G-Sheet Integration: {spreadsheetId ? 'Active & Ready' : 'Pending...'}
             </span>
           </div>
