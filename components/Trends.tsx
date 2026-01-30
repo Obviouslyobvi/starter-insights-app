@@ -103,27 +103,34 @@ const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
         {/* Category Pie Chart */}
         <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
           <h3 className="text-lg font-bold text-slate-800 mb-6">Top Business Categories</h3>
-          <div className="h-80">
+          <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={topCatData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
+                  innerRadius={50}
+                  outerRadius={80}
                   paddingAngle={3}
                   dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  labelLine={false}
                 >
                   {topCatData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip formatter={(value, name) => [`${value} companies`, name]} />
               </PieChart>
             </ResponsiveContainer>
+          </div>
+          {/* Legend below chart */}
+          <div className="flex flex-wrap justify-center gap-3 mt-4">
+            {topCatData.map((entry, index) => (
+              <div key={entry.name} className="flex items-center gap-2 text-xs">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                <span className="text-slate-700 font-medium">{entry.name}</span>
+              </div>
+            ))}
           </div>
         </div>
 
