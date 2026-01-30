@@ -9,14 +9,30 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
   const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [distributionFilter, setDistributionFilter] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
-    return analyses.filter(a => 
-      a.companyName.toLowerCase().includes(search.toLowerCase()) ||
-      a.category.toLowerCase().includes(search.toLowerCase()) ||
-      a.founder.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [analyses, search]);
+    return analyses.filter(a => {
+      const matchesSearch =
+        a.companyName.toLowerCase().includes(search.toLowerCase()) ||
+        a.category.toLowerCase().includes(search.toLowerCase()) ||
+        a.founder.toLowerCase().includes(search.toLowerCase());
+
+      const matchesCategory = !categoryFilter || a.category.toLowerCase() === categoryFilter.toLowerCase();
+
+      const matchesDistribution = !distributionFilter ||
+        a.mainDistributionChannels.some(ch => ch.toLowerCase() === distributionFilter.toLowerCase());
+
+      return matchesSearch && matchesCategory && matchesDistribution;
+    });
+  }, [analyses, search, categoryFilter, distributionFilter]);
+
+  const clearFilters = () => {
+    setCategoryFilter(null);
+    setDistributionFilter(null);
+    setSearch('');
+  };
 
   return (
     <div className="space-y-10 animate-fadeIn">
@@ -24,6 +40,24 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
         <div>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Intelligence Vault</h1>
           <p className="text-slate-600 mt-2 font-medium">Decoded distribution hacks and growth insights.</p>
+          {(categoryFilter || distributionFilter) && (
+            <div className="flex items-center gap-2 mt-3">
+              <span className="text-xs text-slate-500">Filtering by:</span>
+              {categoryFilter && (
+                <span className="text-xs font-black bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full flex items-center gap-2">
+                  {categoryFilter}
+                  <button onClick={() => setCategoryFilter(null)} className="hover:text-indigo-900">×</button>
+                </span>
+              )}
+              {distributionFilter && (
+                <span className="text-xs font-black bg-blue-100 text-blue-700 px-3 py-1 rounded-full flex items-center gap-2">
+                  {distributionFilter}
+                  <button onClick={() => setDistributionFilter(null)} className="hover:text-blue-900">×</button>
+                </span>
+              )}
+              <button onClick={clearFilters} className="text-xs text-rose-500 hover:text-rose-700 font-bold">Clear all</button>
+            </div>
+          )}
         </div>
         
         <div className="flex items-center gap-4 w-full md:w-auto">
@@ -108,13 +142,17 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {story.mainDistributionChannels.map(chan => (
-                        <span key={chan} className="text-[10px] font-black bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl border border-indigo-100/50">
+                        <button
+                          key={chan}
+                          onClick={() => setDistributionFilter(chan)}
+                          className="text-[10px] font-black bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl border border-indigo-100/50 hover:bg-indigo-100 transition-colors cursor-pointer"
+                        >
                           {chan}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </section>
-                  
+
                   <section>
                     <h4 className="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest flex items-center gap-3">
                       <span className="w-8 h-[1px] bg-slate-100"></span> Monetization
@@ -127,12 +165,41 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
                       ))}
                     </div>
                   </section>
+
+                  {/* Links */}
+                  <section className="flex gap-3">
+                    {story.starterStoryUrl && (
+                      <a
+                        href={story.starterStoryUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] font-black text-indigo-600 hover:text-indigo-800 flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-xl transition-colors"
+                      >
+                        <i className="fas fa-external-link-alt"></i> Case Study
+                      </a>
+                    )}
+                    {story.companyWebsite && (
+                      <a
+                        href={story.companyWebsite}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] font-black text-slate-600 hover:text-slate-800 flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-xl transition-colors"
+                      >
+                        <i className="fas fa-globe"></i> Website
+                      </a>
+                    )}
+                  </section>
                 </div>
               </div>
-              
+
               <div className="bg-slate-50/50 px-8 py-5 border-t border-slate-100 flex justify-between items-center">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ref: {new Date(story.analyzedAt).toLocaleDateString()}</span>
-                <span className="text-[10px] font-black text-white bg-indigo-600 px-3 py-1 rounded-full uppercase tracking-widest">{story.category}</span>
+                <button
+                  onClick={() => setCategoryFilter(story.category)}
+                  className="text-[10px] font-black text-white bg-indigo-600 px-3 py-1 rounded-full uppercase tracking-widest hover:bg-indigo-700 transition-colors cursor-pointer"
+                >
+                  {story.category}
+                </button>
               </div>
             </div>
           ))}
