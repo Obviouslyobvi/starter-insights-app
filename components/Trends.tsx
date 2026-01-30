@@ -1,18 +1,28 @@
 
 import React from 'react';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  PieChart, Pie, Cell, Legend 
+import { useNavigate } from 'react-router-dom';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend
 } from 'recharts';
 import { StoryAnalysis } from '../types';
 
 interface TrendsProps {
   analyses: StoryAnalysis[];
+  onCategoryFilter?: (category: string) => void;
 }
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
-const Trends: React.FC<TrendsProps> = ({ analyses }) => {
+const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (category: string) => {
+    if (onCategoryFilter) {
+      onCategoryFilter(category);
+    }
+    navigate('/?category=' + encodeURIComponent(category));
+  };
   if (analyses.length === 0) {
     return (
       <div className="text-center py-20">
@@ -109,14 +119,35 @@ const Trends: React.FC<TrendsProps> = ({ analyses }) => {
           </div>
         </div>
 
+        {/* Category Ranking - Clickable */}
+        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-800 mb-6">Categories (Click to Filter)</h3>
+          <div className="space-y-3">
+            {catData.map((item, idx) => (
+              <button
+                key={item.name}
+                onClick={() => handleCategoryClick(item.name)}
+                className="w-full flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:bg-indigo-50 hover:border-indigo-200 transition-colors cursor-pointer text-left"
+              >
+                <div className="text-2xl font-black text-slate-200">#{idx + 1}</div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-slate-700 capitalize">{item.name}</p>
+                  <p className="text-xs text-slate-400">{item.value} companies</p>
+                </div>
+                <i className="fas fa-chevron-right text-slate-300"></i>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Monetization Ranking */}
-        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2">
+        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
           <h3 className="text-lg font-bold text-slate-800 mb-6">Monetization Dominance</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="space-y-3">
             {monData.map((item, idx) => (
               <div key={item.name} className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
-                <div className="text-2xl font-black text-slate-200">#0{idx + 1}</div>
-                <div>
+                <div className="text-2xl font-black text-slate-200">#{idx + 1}</div>
+                <div className="flex-1">
                   <p className="text-sm font-bold text-slate-700 capitalize">{item.name}</p>
                   <p className="text-xs text-slate-400">{item.value} companies</p>
                 </div>

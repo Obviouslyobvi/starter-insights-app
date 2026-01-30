@@ -4,6 +4,7 @@ import { HashRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import AnalyzeForm from './components/AnalyzeForm';
 import Trends from './components/Trends';
+import Distribution from './components/Distribution';
 import { StoryAnalysis } from './types';
 import { GoogleSheetsService } from './googleSheetsService';
 
@@ -238,6 +239,7 @@ const App: React.FC = () => {
               <SidebarLink to="/" icon="fas fa-th-large" label="Vault" />
               <SidebarLink to="/analyze" icon="fas fa-bolt" label="Crawler" />
               <SidebarLink to="/trends" icon="fas fa-chart-bar" label="Market" />
+              <SidebarLink to="/distribution" icon="fas fa-share-alt" label="Distribution" />
             </div>
 
             <div className="pt-10 border-t border-slate-800">
@@ -265,6 +267,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Dashboard analyses={analyses} onRemove={(id) => setAnalyses(prev => prev.filter(a => a.id !== id))} />} />
             <Route path="/analyze" element={<AnalyzeForm onAdd={(a) => setAnalyses(prev => [a, ...prev])} existingAnalyses={analyses} googleToken={googleToken!} spreadsheetId={spreadsheetId} />} />
             <Route path="/trends" element={<Trends analyses={analyses} />} />
+            <Route path="/distribution" element={<Distribution analyses={analyses} />} />
           </Routes>
         </main>
       </div>
