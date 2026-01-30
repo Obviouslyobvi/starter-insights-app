@@ -2,6 +2,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { StoryAnalysis } from '../types';
+import { normalizeTerm, termsMatch } from '../utils/normalize';
 
 interface DashboardProps {
   analyses: StoryAnalysis[];
@@ -38,7 +39,7 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
       const matchesCategory = !categoryFilter || a.category.toLowerCase() === categoryFilter.toLowerCase();
 
       const matchesDistribution = !distributionFilter ||
-        a.mainDistributionChannels.some(ch => ch.toLowerCase().includes(distributionFilter.toLowerCase()));
+        a.mainDistributionChannels.some(ch => termsMatch(ch, distributionFilter));
 
       return matchesSearch && matchesCategory && matchesDistribution;
     });

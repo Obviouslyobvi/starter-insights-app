@@ -6,6 +6,7 @@ import {
   PieChart, Pie, Cell
 } from 'recharts';
 import { StoryAnalysis } from '../types';
+import { normalizeTerm } from '../utils/normalize';
 
 interface DistributionProps {
   analyses: StoryAnalysis[];
@@ -33,7 +34,7 @@ const Distribution: React.FC<DistributionProps> = ({ analyses }) => {
   const distCounts: Record<string, number> = {};
   analyses.forEach(a => {
     a.mainDistributionChannels.forEach(c => {
-      const normalized = c.trim();
+      const normalized = normalizeTerm(c);
       distCounts[normalized] = (distCounts[normalized] || 0) + 1;
     });
   });
@@ -51,7 +52,7 @@ const Distribution: React.FC<DistributionProps> = ({ analyses }) => {
       categoryDistribution[a.category] = {};
     }
     a.mainDistributionChannels.forEach(c => {
-      const normalized = c.trim();
+      const normalized = normalizeTerm(c);
       categoryDistribution[a.category][normalized] = (categoryDistribution[a.category][normalized] || 0) + 1;
     });
   });

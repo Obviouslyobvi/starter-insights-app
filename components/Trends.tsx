@@ -6,6 +6,7 @@ import {
   PieChart, Pie, Cell, Legend
 } from 'recharts';
 import { StoryAnalysis } from '../types';
+import { normalizeTerm } from '../utils/normalize';
 
 interface TrendsProps {
   analyses: StoryAnalysis[];
@@ -36,7 +37,7 @@ const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
   const distCounts: Record<string, number> = {};
   analyses.forEach(a => {
     a.mainDistributionChannels.forEach(c => {
-      const normalized = c.trim().toLowerCase();
+      const normalized = normalizeTerm(c);
       distCounts[normalized] = (distCounts[normalized] || 0) + 1;
     });
   });
@@ -50,7 +51,7 @@ const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
   const monCounts: Record<string, number> = {};
   analyses.forEach(a => {
     a.mainMonetizationMethods.forEach(m => {
-      const normalized = m.trim().toLowerCase();
+      const normalized = normalizeTerm(m);
       monCounts[normalized] = (monCounts[normalized] || 0) + 1;
     });
   });
