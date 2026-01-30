@@ -1,5 +1,6 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { StoryAnalysis } from '../types';
 
 interface DashboardProps {
@@ -11,6 +12,21 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [distributionFilter, setDistributionFilter] = useState<string | null>(null);
+  const location = useLocation();
+
+  // Read URL parameters and set filters
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const category = params.get('category');
+    const distribution = params.get('distribution');
+
+    if (category) {
+      setCategoryFilter(category);
+    }
+    if (distribution) {
+      setDistributionFilter(distribution);
+    }
+  }, [location.search]);
 
   const filtered = useMemo(() => {
     return analyses.filter(a => {
@@ -22,7 +38,7 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
       const matchesCategory = !categoryFilter || a.category.toLowerCase() === categoryFilter.toLowerCase();
 
       const matchesDistribution = !distributionFilter ||
-        a.mainDistributionChannels.some(ch => ch.toLowerCase() === distributionFilter.toLowerCase());
+        a.mainDistributionChannels.some(ch => ch.toLowerCase().includes(distributionFilter.toLowerCase()));
 
       return matchesSearch && matchesCategory && matchesDistribution;
     });
@@ -32,6 +48,8 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
     setCategoryFilter(null);
     setDistributionFilter(null);
     setSearch('');
+    // Clear URL params
+    window.history.replaceState(null, '', window.location.pathname + window.location.hash.split('?')[0]);
   };
 
   return (
@@ -42,7 +60,7 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
           <p className="text-slate-600 mt-2 font-medium">Decoded distribution hacks and growth insights.</p>
           {(categoryFilter || distributionFilter) && (
             <div className="flex items-center gap-2 mt-3">
-              <span className="text-xs text-slate-500">Filtering by:</span>
+              <span className="text-xs text-slate-700 font-medium">Filtering by:</span>
               {categoryFilter && (
                 <span className="text-xs font-black bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full flex items-center gap-2">
                   {categoryFilter}
@@ -76,7 +94,7 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
               <i className="fas fa-database text-lg"></i>
             </div>
             <div>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Database</p>
+              <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Database</p>
               <p className="text-xl font-black text-slate-900 leading-none">{analyses.length}</p>
             </div>
           </div>
@@ -86,10 +104,10 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
       {filtered.length === 0 ? (
         <div className="bg-white rounded-[3rem] border-2 border-dashed border-slate-200 p-20 text-center">
           <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6 mx-auto">
-            <i className="fas fa-ghost text-3xl text-slate-200"></i>
+            <i className="fas fa-ghost text-3xl text-slate-400"></i>
           </div>
           <h3 className="text-xl font-black text-slate-900">No matches found</h3>
-          <p className="text-slate-500 mt-2 font-medium">Try a different search or crawl new stories.</p>
+          <p className="text-slate-600 mt-2 font-medium">Try a different search or crawl new stories.</p>
           {analyses.length === 0 && (
             <a href="#/analyze" className="mt-8 inline-flex bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-indigo-700 transition-all gap-3 items-center shadow-xl shadow-indigo-100">
               <i className="fas fa-plus"></i> Start Analyzing
@@ -109,7 +127,7 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
                     <div>
                       <h3 className="text-2xl font-black text-slate-900 leading-tight">{story.companyName}</h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs font-bold text-slate-400">{story.founder}</span>
+                        <span className="text-xs font-bold text-slate-600">{story.founder}</span>
                         <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
                         <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md uppercase tracking-tight">{story.revenue}</span>
                       </div>
@@ -137,8 +155,8 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
 
                 <div className="space-y-8">
                   <section>
-                    <h4 className="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest flex items-center gap-3">
-                      <span className="w-8 h-[1px] bg-slate-100"></span> Distribution Strategy
+                    <h4 className="text-[10px] font-black text-slate-600 uppercase mb-4 tracking-widest flex items-center gap-3">
+                      <span className="w-8 h-[1px] bg-slate-300"></span> Distribution Strategy
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {story.mainDistributionChannels.map(chan => (
@@ -154,8 +172,8 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
                   </section>
 
                   <section>
-                    <h4 className="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest flex items-center gap-3">
-                      <span className="w-8 h-[1px] bg-slate-100"></span> Monetization
+                    <h4 className="text-[10px] font-black text-slate-600 uppercase mb-4 tracking-widest flex items-center gap-3">
+                      <span className="w-8 h-[1px] bg-slate-300"></span> Monetization
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {story.mainMonetizationMethods.map(meth => (
@@ -193,7 +211,7 @@ const Dashboard: React.FC<DashboardProps> = ({ analyses, onRemove }) => {
               </div>
 
               <div className="bg-slate-50/50 px-8 py-5 border-t border-slate-100 flex justify-between items-center">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ref: {new Date(story.analyzedAt).toLocaleDateString()}</span>
+                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Ref: {new Date(story.analyzedAt).toLocaleDateString()}</span>
                 <button
                   onClick={() => setCategoryFilter(story.category)}
                   className="text-[10px] font-black text-white bg-indigo-600 px-3 py-1 rounded-full uppercase tracking-widest hover:bg-indigo-700 transition-colors cursor-pointer"

@@ -23,8 +23,8 @@ const Distribution: React.FC<DistributionProps> = ({ analyses }) => {
   if (analyses.length === 0) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-slate-400">Not enough data to generate distribution insights</h2>
-        <p className="text-slate-500 mt-2">Analyze at least 3 stories to see aggregate distribution intelligence.</p>
+        <h2 className="text-2xl font-bold text-slate-600">Not enough data to generate distribution insights</h2>
+        <p className="text-slate-700 mt-2">Analyze at least 3 stories to see aggregate distribution intelligence.</p>
       </div>
     );
   }
@@ -60,7 +60,7 @@ const Distribution: React.FC<DistributionProps> = ({ analyses }) => {
     <div className="space-y-8 animate-fadeIn">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Distribution Intelligence</h1>
-        <p className="text-slate-500 mt-1">How successful companies acquire customers.</p>
+        <p className="text-slate-700 mt-1">How successful companies acquire customers.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -120,12 +120,12 @@ const Distribution: React.FC<DistributionProps> = ({ analyses }) => {
                 onClick={() => handleDistributionClick(item.name)}
                 className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:bg-indigo-50 hover:border-indigo-200 transition-colors cursor-pointer text-left"
               >
-                <div className="text-2xl font-black text-slate-200">#{idx + 1}</div>
+                <div className="text-2xl font-black text-slate-400">#{idx + 1}</div>
                 <div className="flex-1">
                   <p className="text-sm font-bold text-slate-700">{item.name}</p>
-                  <p className="text-xs text-slate-400">{item.value} companies</p>
+                  <p className="text-xs text-slate-600">{item.value} companies</p>
                 </div>
-                <i className="fas fa-chevron-right text-slate-300"></i>
+                <i className="fas fa-chevron-right text-slate-500"></i>
               </button>
             ))}
           </div>
@@ -150,8 +150,8 @@ const Distribution: React.FC<DistributionProps> = ({ analyses }) => {
                         onClick={() => handleDistributionClick(channel)}
                         className="w-full flex items-center justify-between text-xs p-2 rounded-lg hover:bg-indigo-50 transition-colors"
                       >
-                        <span className="text-slate-600">
-                          <span className="font-bold text-slate-400 mr-2">{idx + 1}.</span>
+                        <span className="text-slate-700">
+                          <span className="font-bold text-slate-500 mr-2">{idx + 1}.</span>
                           {channel}
                         </span>
                         <span className="font-bold text-indigo-600">{count}</span>

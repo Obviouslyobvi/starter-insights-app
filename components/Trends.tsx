@@ -26,8 +26,8 @@ const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
   if (analyses.length === 0) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-slate-400">Not enough data to generate trends</h2>
-        <p className="text-slate-500 mt-2">Analyze at least 3 stories to see aggregate market intelligence.</p>
+        <h2 className="text-2xl font-bold text-slate-600">Not enough data to generate trends</h2>
+        <p className="text-slate-700 mt-2">Analyze at least 3 stories to see aggregate market intelligence.</p>
       </div>
     );
   }
@@ -70,7 +70,7 @@ const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
     <div className="space-y-8 animate-fadeIn">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Market Intelligence</h1>
-        <p className="text-slate-500 mt-1">Aggregated insights across your analyzed database.</p>
+        <p className="text-slate-700 mt-1">Aggregated insights across your analyzed database.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -129,12 +129,12 @@ const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
                 onClick={() => handleCategoryClick(item.name)}
                 className="w-full flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:bg-indigo-50 hover:border-indigo-200 transition-colors cursor-pointer text-left"
               >
-                <div className="text-2xl font-black text-slate-200">#{idx + 1}</div>
+                <div className="text-2xl font-black text-slate-400">#{idx + 1}</div>
                 <div className="flex-1">
                   <p className="text-sm font-bold text-slate-700 capitalize">{item.name}</p>
-                  <p className="text-xs text-slate-400">{item.value} companies</p>
+                  <p className="text-xs text-slate-600">{item.value} companies</p>
                 </div>
-                <i className="fas fa-chevron-right text-slate-300"></i>
+                <i className="fas fa-chevron-right text-slate-500"></i>
               </button>
             ))}
           </div>
@@ -146,10 +146,10 @@ const Trends: React.FC<TrendsProps> = ({ analyses, onCategoryFilter }) => {
           <div className="space-y-3">
             {monData.map((item, idx) => (
               <div key={item.name} className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
-                <div className="text-2xl font-black text-slate-200">#{idx + 1}</div>
+                <div className="text-2xl font-black text-slate-400">#{idx + 1}</div>
                 <div className="flex-1">
                   <p className="text-sm font-bold text-slate-700 capitalize">{item.name}</p>
-                  <p className="text-xs text-slate-400">{item.value} companies</p>
+                  <p className="text-xs text-slate-600">{item.value} companies</p>
                 </div>
               </div>
             ))}
