@@ -10,7 +10,11 @@ import { GoogleSheetsService } from './googleSheetsService';
 
 const App: React.FC = () => {
   const [analyses, setAnalyses] = useState<StoryAnalysis[]>([]);
-  const [googleToken, setGoogleToken] = useState<string | null>(null);
+  const [googleToken, setGoogleToken] = useState<string | null>(localStorage.getItem('google_access_token'));
+  const [tokenExpiry, setTokenExpiry] = useState<number | null>(() => {
+    const expiry = localStorage.getItem('google_token_expiry');
+    return expiry ? parseInt(expiry, 10) : null;
+  });
   const [clientId, setClientId] = useState<string>(localStorage.getItem('google_client_id') || '');
   const [spreadsheetId, setSpreadsheetId] = useState<string | null>(localStorage.getItem('gsheet_id'));
   const [isInitializing, setIsInitializing] = useState(false);
@@ -34,14 +38,36 @@ const App: React.FC = () => {
 
   const finalRedirectUri = (manualRedirectUri || currentRedirectUri);
 
+  // Check if stored token is expired
+  useEffect(() => {
+    if (googleToken && tokenExpiry) {
+      if (Date.now() > tokenExpiry) {
+        // Token expired, clear it
+        setGoogleToken(null);
+        setTokenExpiry(null);
+        localStorage.removeItem('google_access_token');
+        localStorage.removeItem('google_token_expiry');
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const processToken = () => {
       const hash = window.location.hash || window.location.search;
       if (hash && (hash.includes('access_token=') || hash.includes('token='))) {
         const params = new URLSearchParams(hash.replace(/^#/, '').replace(/^\?/, ''));
         const token = params.get('access_token') || params.get('token');
+        const expiresIn = params.get('expires_in');
         if (token) {
+          // Calculate expiry time (default 1 hour if not provided)
+          const expiryTime = Date.now() + (expiresIn ? parseInt(expiresIn, 10) * 1000 : 3600000);
+
+          // Store in state and localStorage
           setGoogleToken(token);
+          setTokenExpiry(expiryTime);
+          localStorage.setItem('google_access_token', token);
+          localStorage.setItem('google_token_expiry', expiryTime.toString());
+
           window.history.replaceState(null, '', window.location.pathname);
         }
       }
@@ -252,8 +278,15 @@ const App: React.FC = () => {
                   <p className="text-[10px] font-bold truncate opacity-80">Synced</p>
                 </div>
               </div>
-              <button 
-                onClick={() => { setGoogleToken(null); setAnalyses([]); localStorage.removeItem('gsheet_id'); }}
+              <button
+                onClick={() => {
+                  setGoogleToken(null);
+                  setTokenExpiry(null);
+                  setAnalyses([]);
+                  localStorage.removeItem('gsheet_id');
+                  localStorage.removeItem('google_access_token');
+                  localStorage.removeItem('google_token_expiry');
+                }}
                 className="w-full flex items-center gap-3 px-6 py-4 text-slate-500 hover:text-rose-400 font-black text-xs uppercase tracking-widest transition-colors"
               >
                 <i className="fas fa-power-off"></i> Sign Out
