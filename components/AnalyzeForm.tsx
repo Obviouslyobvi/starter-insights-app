@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { discoverAllStories, analyzeStory } from '../geminiService';
+import { discoverAllStories, analyzeStory, getGeminiKey, setGeminiKey } from '../geminiService';
 import { StoryAnalysis } from '../types';
 import { GoogleSheetsService } from '../googleSheetsService';
 
@@ -21,6 +21,8 @@ const AnalyzeForm: React.FC<AnalyzeFormProps> = ({ onAdd, existingAnalyses, goog
   const [queue, setQueue] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [geminiKey, setGeminiKeyState] = useState<string>(() => getGeminiKey());
+  const saveGeminiKey = (value: string) => { setGeminiKeyState(value); setGeminiKey(value); };
   
   const logContainerRef = useRef<HTMLDivElement>(null);
   const isRunningRef = useRef(false);
@@ -37,6 +39,7 @@ const AnalyzeForm: React.FC<AnalyzeFormProps> = ({ onAdd, existingAnalyses, goog
 
   const startAutomatedCrawl = async () => {
     if (isRunningRef.current || !spreadsheetId) return;
+    if (!getGeminiKey()) { setError('Add your Gemini API key below before starting.'); return; }
     
     isRunningRef.current = true;
     setStatus('discovering');
@@ -178,6 +181,24 @@ const AnalyzeForm: React.FC<AnalyzeFormProps> = ({ onAdd, existingAnalyses, goog
         </div>
 
         <div className="p-10">
+          <div className="mb-6 px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl">
+            <label htmlFor="gemini-key" className="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">
+              Your Gemini API key
+            </label>
+            <input
+              id="gemini-key"
+              type="password"
+              autoComplete="off"
+              value={geminiKey}
+              onChange={(e) => saveGeminiKey(e.target.value)}
+              placeholder="Paste a key from aistudio.google.com/apikey"
+              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <p className="text-xs text-slate-500 mt-2">
+              Stored only in this browser. Calls to Gemini go straight from your browser to Google and are billed to your key.
+            </p>
+          </div>
+
           <div className="flex items-center gap-3 mb-8 px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl">
             <div className={`w-3 h-3 rounded-full ${spreadsheetId ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`}></div>
             <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">

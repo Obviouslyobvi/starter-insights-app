@@ -25,7 +25,7 @@ Before the app can save data to your Google Sheets, you must link it to a Google
 
 ### 2. Getting the App Live
 1. Open this project in your local development environment.
-2. Ensure you have your `API_KEY` for the Gemini API set up in your environment.
+2. Open the Crawler page and paste your own Gemini API key (from aistudio.google.com/apikey) into the key field. It is saved only in your browser and is never built into the site.
 3. Run the app and follow the on-screen **Configuration Guide** to paste your Client ID.
 
 ---

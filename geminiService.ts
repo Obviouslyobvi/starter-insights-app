@@ -2,10 +2,28 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResult } from "./types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const KEY_STORAGE = 'starterinsights.geminiKey';
+
+export const getGeminiKey = (): string => {
+  try { return localStorage.getItem(KEY_STORAGE) || ''; } catch { return ''; }
+};
+export const setGeminiKey = (key: string) => {
+  try {
+    if (key.trim()) localStorage.setItem(KEY_STORAGE, key.trim());
+    else localStorage.removeItem(KEY_STORAGE);
+  } catch {}
+};
+
+// The key is read at call time from this browser's storage. It is never
+// part of the built site, so nothing in the public bundle can leak it.
+const client = () => {
+  const apiKey = getGeminiKey();
+  if (!apiKey) throw new Error('Add your Gemini API key in the Crawler settings first.');
+  return new GoogleGenAI({ apiKey });
+};
 
 export const discoverAllStories = async (existingCount: number = 0, batchSize: number = 10): Promise<string[]> => {
-  const response = await ai.models.generateContent({
+  const response = await client().models.generateContent({
     model: 'gemini-2.0-flash',
     contents: `You are a high-performance business intelligence bot. 
     Find ${batchSize} unique, high-revenue case study company names from starterstory.com. 
@@ -38,7 +56,7 @@ export const discoverAllStories = async (existingCount: number = 0, batchSize: n
 };
 
 export const analyzeStory = async (companyName: string): Promise<AnalysisResult> => {
-  const response = await ai.models.generateContent({
+  const response = await client().models.generateContent({
     model: 'gemini-2.0-flash',
     contents: `Deeply analyze the business case study for "${companyName}" on starterstory.com.
 
